@@ -54,12 +54,12 @@
 
 ---
 
-## 🏗️ Application Architecture
+## Application Architecture
 User → RateLimiter → API Layer → MongoDB
 
 ---
 
-## 🚀 Notes
+## Notes
 
 - Role-based access control is implemented (Admin vs. User)
 - Passwords are securely hashed using `bcrypt`
