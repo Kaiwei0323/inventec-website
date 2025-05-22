@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Inventec Website
 
-## Getting Started
+## Software Requirements
 
-First, run the development server:
+- **Next.js**: 13.1.6
+- **Tailwind CSS**
+- **Mongoose**
+- **MongoDB**
+- **NextAuth**
+- **Bcrypt**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Authentication APIs
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `POST /api/auth/login` — Login with username and password   
+- `POST /api/register` — Register new user with username and password  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Product Management APIs
 
-To learn more about Next.js, take a look at the following resources:
+- `POST /api/product` — Create a new product  
+- `PUT /api/product/:id` — Edit existing product  
+- `DELETE /api/product/:id` — Delete a product  
+- `GET /api/product` — Render/fetch all products  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## MongoDB Schema
 
-## Deploy on Vercel
+### User
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Field    | Type   | Description              |
+|----------|--------|--------------------------|
+| Email    | String | Unique user email        |
+| Password | String | Bcrypt-hashed password   |
+| Role     | String | `User` or `Admin`        |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Product
+
+| Field           | Type     | Description                              |
+|------------------|----------|------------------------------------------|
+| Name             | String   | Product name                             |
+| ImageUrl         | String   | URL to product image                     |
+| Description      | String   | Short description                        |
+| Chip             | String   | Chip/Processor used                      |
+| Support OS       | [String] | List of supported operating systems      |
+| Tops             | Number   | Performance metric (TOPS)                |
+| Category         | String   | Product category                         |
+| Platform         | String   | Platform name (e.g., QCS6490, Hailo)     |
+| DownloadUrl      | String   | Link to downloadable file                |
+| DetailPagePath   | String   | Internal route to product detail page    |
+
+---
+
+## 🏗️ Application Architecture
+User → RateLimiter → API Layer → MongoDB
+
+---
+
+## 🚀 Notes
+
+- Role-based access control is implemented (Admin vs. User)
+- Passwords are securely hashed using `bcrypt`
+- NextAuth handles authentication and session management
