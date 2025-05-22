@@ -48,7 +48,7 @@
 | Support OS       | [String] | List of supported operating systems      |
 | Tops             | Number   | Performance metric (TOPS)                |
 | Category         | String   | Product category                         |
-| Platform         | String   | Platform name (e.g., QCS6490, Hailo)     |
+| Platform         | String   | Platform name (e.g., Qualcomm, Nvidia)   |
 | DownloadUrl      | String   | Link to downloadable file                |
 | DetailPagePath   | String   | Internal route to product detail page    |
 
