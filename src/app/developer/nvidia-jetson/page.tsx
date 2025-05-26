@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import DeveloperCommon from '../../components/layout/DeveloperCommon'
 
 export default function NvidiaJetsonDeveloperPage() {
   const nconSupport = [
@@ -15,7 +16,9 @@ export default function NvidiaJetsonDeveloperPage() {
   ];
 
   return (
+
     <div className="max-w-5xl mx-auto px-6 py-10 text-gray-900">
+      <DeveloperCommon />
       <h1 className="text-3xl font-bold text-center mb-10">Nvidia Jetson Developer Support</h1>
 
       {/* Table of Contents */}

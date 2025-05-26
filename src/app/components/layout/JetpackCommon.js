@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function JetpackCommon() {
   return (
-    <div className="mt-8 border-t pt-6">
+    <div className="mt-8 pt-6">
       {/* Back Button */}
       <Link
         href="/developer/nvidia-jetson"

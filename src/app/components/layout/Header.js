@@ -9,7 +9,6 @@ export default function Header() {
   const status = session.status;
   const [hasRedirected, setHasRedirected] = useState(false);
   const router = useRouter();
-  const [showDropdown, setShowDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -45,49 +44,10 @@ export default function Header() {
             <Link className={linkStyle} href="/">Home</Link>
             <Link className={linkStyle} href="/product">Products</Link>
             {status === "authenticated" && session.data?.user?.role === "admin" && (
-              <Link className={linkStyle} href="/createproduct">
-                Create Product
-              </Link>
+              <Link className={linkStyle} href="/createproduct">Create Product</Link>
             )}
 
-            {/* Developer Dropdown */}
-            <div
-              className="relative inline-block"
-              onMouseEnter={() => setShowDropdown(true)}
-              onMouseLeave={() => setShowDropdown(false)}
-            >
-              <button
-                className={`${linkStyle} focus:outline-none`}
-                type="button"
-                aria-haspopup="true"
-                aria-expanded={showDropdown}
-              >
-                Developer
-              </button>
-
-              {showDropdown && (
-                <div
-                  className="absolute left-0 top-full bg-white border rounded-lg shadow-lg min-w-[200px] z-50 overflow-hidden py-1"
-                  style={{ marginTop: 0, paddingTop: "6px" }} // visually separate but no gap
-                >
-                  <Link
-                    href="/developer/qc01"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    QC01
-                  </Link>
-                  <Link
-                    href="/developer/nvidia-jetson"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors duration-150"
-                    onClick={() => setShowDropdown(false)}
-                  >
-                    Nvidia Jetson
-                  </Link>
-                </div>
-              )}
-            </div>
-
+            <Link className={linkStyle} href="/developer">Developer</Link>
             <Link className={linkStyle} href="/about">About</Link>
             <Link className={linkStyle} href="/contact">Contact</Link>
           </nav>
@@ -96,9 +56,7 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-4">
             {status === "authenticated" ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-500">
-                  {session.data?.user?.email}
-                </span>
+                <span className="text-sm text-gray-500">{session.data?.user?.email}</span>
                 <button
                   onClick={() => signOut()}
                   className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200"
@@ -108,12 +66,7 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link
-                  href="/login"
-                  className="text-gray-600 font-medium hover:text-primary hover:underline transition-colors duration-200"
-                >
-                  Sign in
-                </Link>
+                <Link href="/login" className="text-gray-600 font-medium hover:text-primary hover:underline transition-colors duration-200">Sign in</Link>
                 <Link
                   href="/register"
                   className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-colors duration-200"
@@ -150,50 +103,19 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden">
           <div className="space-y-1 px-2 pb-3 pt-2">
-            <Link
-              href="/"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              href="/product"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Products
-            </Link>
+            <Link href="/" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+            <Link href="/product" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>Products</Link>
             {status === "authenticated" && session.data?.user?.role === "admin" && (
-              <Link
-                href="/createproduct"
-                className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Create Product
-              </Link>
+              <Link href="/createproduct" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>Create Product</Link>
             )}
-            <Link
-              href="/about"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
+            <Link href="/developer" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>Developer</Link>
+            <Link href="/about" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>About</Link>
+            <Link href="/contact" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
           </div>
           <div className="border-t border-gray-200 pb-3 pt-4">
             {status === "authenticated" ? (
               <div className="space-y-1 px-2">
-                <div className="px-3 py-2 text-sm text-gray-500">
-                  {session.data?.user?.email}
-                </div>
+                <div className="px-3 py-2 text-sm text-gray-500">{session.data?.user?.email}</div>
                 <button
                   onClick={() => {
                     signOut();
@@ -206,20 +128,8 @@ export default function Header() {
               </div>
             ) : (
               <div className="space-y-1 px-2">
-                <Link
-                  href="/login"
-                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Sign in
-                </Link>
-                <Link
-                  href="/register"
-                  className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Sign up
-                </Link>
+                <Link href="/login" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>Sign in</Link>
+                <Link href="/register" className="block px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-50 hover:text-primary rounded-md transition-colors duration-200" onClick={() => setIsMobileMenuOpen(false)}>Sign up</Link>
               </div>
             )}
           </div>

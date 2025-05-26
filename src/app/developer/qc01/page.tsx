@@ -1,10 +1,12 @@
 'use client';
 import Link from 'next/link';
+import DeveloperCommon from '../../components/layout/DeveloperCommon'
 
 export default function QC01DeveloperPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 text-gray-900">
       {/* Page Header */}
+      <DeveloperCommon />
       <header className="text-center mb-8">
         <h1 className="text-3xl font-bold text-center">QCS6490 Developer Portal</h1>
         <p className="text-lg text-gray-600 mt-5">Your all-in-one hub for development, deployment, and optimization.</p>
