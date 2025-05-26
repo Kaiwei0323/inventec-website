@@ -36,24 +36,16 @@ function FAQItem({ question, answer }: FAQItemProps) {
 export default function QC01QA() {
   const faqs = [
     {
-      question: "What is QC01 and what are its main features?",
-      answer: "QC01 is a Qualcomm-based development platform that offers high-performance computing capabilities for edge AI applications. Key features include: 1) Advanced AI processing capabilities, 2) Integrated 5G connectivity, 3) Enhanced security features, 4) Power-efficient design, and 5) Comprehensive development tools and SDKs."
+      question: "Why is the device showing log errors and unable to install any packages?",
+      answer: "You may have accidentally run `apt upgrade`, which can cause system issues. Please reflash the image and reinstall the Ubuntu minimal."
     },
     {
-      question: "How do I set up my development environment for QC01?",
-      answer: "To set up your QC01 development environment: 1) Install the Qualcomm Development Network (QDN) tools, 2) Configure your build environment with the required SDKs, 3) Set up the necessary development board drivers, 4) Install the recommended IDE and debugging tools, and 5) Follow our detailed setup guide in the documentation section."
+      question: "Why does my Firefox browser keep crashing?",
+      answer: "Try launching Firefox with Wayland support by running `MOZ_ENABLE_WAYLAND=1 firefox` in the terminal."
     },
     {
-      question: "What are the best practices for optimizing QC01 applications?",
-      answer: "For optimal QC01 application performance: 1) Utilize Qualcomm's Neural Processing SDK for AI workloads, 2) Implement proper power management techniques, 3) Use the hardware acceleration features effectively, 4) Optimize memory usage and cache utilization, and 5) Profile your application using Qualcomm's performance tools."
-    },
-    {
-      question: "How can I debug issues on QC01 hardware?",
-      answer: "For debugging on QC01: 1) Use Qualcomm's Debug Agent for low-level debugging, 2) Implement logging mechanisms using the provided SDK tools, 3) Utilize the on-chip trace and debug features, 4) Monitor system resources using the performance monitoring tools, and 5) Check our troubleshooting guide for common issues."
-    },
-    {
-      question: "What security considerations should I keep in mind when developing for QC01?",
-      answer: "Key security considerations include: 1) Implementing secure boot mechanisms, 2) Using Qualcomm's Trusted Execution Environment, 3) Following secure coding practices, 4) Regularly updating security patches and firmware, and 5) Implementing proper authentication and encryption mechanisms."
+      question: "Does the QC01 support Bluetooth? The settings show 'No Bluetooth Found'.",
+      answer: "Yes, the QC01 does support Bluetooth. Please refer to Section 8 of the user manual for instructions on enabling and managing Bluetooth."
     }
   ];
 

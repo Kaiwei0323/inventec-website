@@ -36,25 +36,9 @@ function FAQItem({ question, answer }: FAQItemProps) {
 export default function NvidiaJetsonQA() {
   const faqs = [
     {
-      question: "How do I get started with Nvidia Jetson development?",
-      answer: "To get started with Nvidia Jetson development, first install the Jetson SDK (JetPack) which includes the OS image, developer tools, and libraries. Then, follow our setup guide in the documentation section for detailed instructions on hardware setup and initial software configuration."
+      question: "I encountered an error while trying to reflash the image via Ethernet (OTA). What should I do?",
+      answer: "Please try reflashing the image using the USB method as an alternative."
     },
-    {
-      question: "What are the system requirements for Jetson development?",
-      answer: "For Jetson development, you'll need: 1) A host PC running Ubuntu Linux, 2) Minimum 16GB RAM recommended, 3) At least 100GB free disk space, 4) USB port for flashing the device, and 5) Internet connection for downloading SDK components."
-    },
-    {
-      question: "How can I optimize my AI model for Jetson devices?",
-      answer: "To optimize AI models for Jetson: 1) Use TensorRT for model optimization, 2) Quantize your models to INT8 or FP16, 3) Utilize NVIDIA's Transfer Learning Toolkit, 4) Profile your application with Nsight Systems, and 5) Consider using the NVIDIA TAO Toolkit for model adaptation."
-    },
-    {
-      question: "What debugging tools are available for Jetson development?",
-      answer: "Key debugging tools include: 1) NVIDIA Nsight Systems for system-wide performance analysis, 2) NVIDIA Nsight Graphics for GPU debugging, 3) GDB for general debugging, 4) Tegrastats for monitoring system resources, and 5) Docker containers for isolated development environments."
-    },
-    {
-      question: "How do I update my Jetson device's software?",
-      answer: "To update your Jetson device: 1) Use the SDK Manager for major updates, 2) Run 'sudo apt update && sudo apt upgrade' for package updates, 3) Check NVIDIA's developer portal for security updates, and 4) Always backup your data before major updates."
-    }
   ];
 
   return (
