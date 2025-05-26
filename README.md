@@ -52,7 +52,7 @@ A secure, full-stack web application for managing and showcasing Inventec hardwa
 ---
 
 ## Application Architecture
-USER → Rate Limiter → API Routes → Server Logic → MongoDB
+User → Rate Limiter → APIs → Server → MongoDB
 
 ---
 
