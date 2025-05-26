@@ -4,7 +4,7 @@ A secure, full-stack web application for managing and showcasing Inventec hardwa
 
 ---
 
-## 🧩 Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js `v15.3.2`
 - **Authentication**: NextAuth.js
