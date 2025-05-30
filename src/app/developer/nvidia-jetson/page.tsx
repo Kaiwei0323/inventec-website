@@ -4,15 +4,15 @@ import DeveloperCommon from '../../components/layout/DeveloperCommon'
 
 export default function NvidiaJetsonDeveloperPage() {
   const nconSupport = [
-    { version: "6.2", note: "Adds Super Mode for 2× faster AI, updates to Ubuntu 22.04 with kernel 5.15, and includes the latest CUDA 12.6, TensorRT 10.3, and cuDNN 9.3." },
-    { version: "6.1", note: "Improves camera efficiency with 40% lower CPU usage, adds fTPM for security, and updates the AI stack with CUDA 12.6, TensorRT 10.3, and Ubuntu 22.04 support." },
-    { version: "6.0", note: "Introduces a production-ready AI stack with CUDA 12.2, TensorRT 8.6, and Ubuntu 22.04, offering kernel flexibility, OTA updates, and an upgradable compute stack for Jetson Orin devices." },
-    { version: "5.1.2", note: "Introduces support for the Jetson AGX Orin Industrial module, enhances camera synchronization and security features, and updates VPI to version 2.2, while maintaining the same compute stack as JetPack 5.1.1." },
+    { version: "6.2", note: "Added Super Mode for 2× faster AI, updated to Ubuntu 22.04 with kernel 5.15, and included the latest CUDA 12.6, TensorRT 10.3, and cuDNN 9.3." },
+    { version: "6.1", note: "Improved camera efficiency with 40% lower CPU usage, added fTPM for security, and updated the AI stack with CUDA 12.6, TensorRT 10.3, and Ubuntu 22.04 support." },
+    { version: "6.0", note: "Introduced a production-ready AI stack with CUDA 12.2, TensorRT 8.6, and Ubuntu 22.04, offering kernel flexibility, OTA updates, and an upgradable compute stack for Jetson Orin devices." },
+    { version: "5.1.2", note: "Introduced support for the Jetson AGX Orin Industrial module, enhanced camera synchronization and security features, and updated VPI to version 2.2, while maintaining the same compute stack as JetPack 5.1.1." },
   ];
 
   const pconSupport = [
-    { version: "6.1", note: "Improves camera efficiency with 40% lower CPU usage, adds fTPM for security, and updates the AI stack with CUDA 12.6, TensorRT 10.3, and Ubuntu 22.04 support." },
-    { version: "5.1.2", note: "Introduces support for the Jetson AGX Orin Industrial module, enhances camera synchronization and security features, and updates VPI to version 2.2, while maintaining the same compute stack as JetPack 5.1.1." },
+    { version: "6.1", note: "Improved camera efficiency with 40% lower CPU usage, added fTPM for security, and updated the AI stack with CUDA 12.6, TensorRT 10.3, and Ubuntu 22.04 support." },
+    { version: "5.1.2", note: "Introduced support for the Jetson AGX Orin Industrial module, enhanced camera synchronization and security features, and updated VPI to version 2.2, while maintaining the same compute stack as JetPack 5.1.1." },
   ];
 
   return (

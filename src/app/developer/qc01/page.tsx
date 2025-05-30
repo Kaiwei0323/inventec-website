@@ -39,13 +39,13 @@ export default function QC01DeveloperPage() {
           and preparing the development environment.
         </p>
         <li>
-        <Link
-          href="/download/userguide/qc01/QC01W-UserGuide-v1.0.pdf"
-          download
-          className="text-[#f60d0d] hover:underline"
-        >
-          Download QCS6490 User Manual
-        </Link>
+          <Link
+            href="/download/userguide/qc01/QC01W-UserGuide-v1.0.pdf"
+            download
+            className="text-[#f60d0d] hover:underline"
+          >
+            Download QCS6490 User Manual
+          </Link>
         </li>
       </section>
 
@@ -53,8 +53,26 @@ export default function QC01DeveloperPage() {
       <section id="image-reflash">
         <h2 className="text-2xl font-semibold text-[#f60d0d] mb-3 mt-5">2. Image Reflash</h2>
         <p className="text-gray-700 mb-4">
-          Please refer to Section 5 & 6 in the user manual.
+          Please refer to Section 5 & 6 in the user manual for detailed reflashing instructions.
         </p>
+        <ul className="list-disc list-inside text-gray-700 space-y-2 mb-4 text-left">
+          <li>
+            <Link
+              href="/developer/qc01/imageReflash/qclinux"
+              className="text-[#f60d0d] hover:underline"
+            >
+              QCLinux Image
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/developer/qc01/imageReflash/ubuntu"
+              className="text-[#f60d0d] hover:underline"
+            >
+              Ubuntu Image
+            </Link>
+          </li>
+        </ul>
       </section>
 
       {/* Demo App */}
@@ -84,13 +102,13 @@ export default function QC01DeveloperPage() {
           Explore our GitHub repo:
         </p>
         <li>
-        <Link
-          href="https://github.com/Kaiwei0323/SNPE_Flask/tree/demo"
-          target="_blank"
-          className="text-[#f60d0d] hover:underline"
-        >
-          SNPE Flask Demo Repository
-        </Link>
+          <Link
+            href="https://github.com/Kaiwei0323/SNPE_Flask/tree/demo"
+            target="_blank"
+            className="text-[#f60d0d] hover:underline"
+          >
+            SNPE Flask Demo Repository
+          </Link>
         </li>
       </section>
 
