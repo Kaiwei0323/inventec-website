@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function DeveloperCommon() {
   return (
-    <div className="pt-6">
+    <div className="pt-3">
       {/* Back Button */}
       <Link
         href="/developer"
