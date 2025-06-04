@@ -36,13 +36,15 @@ export default function Hero() {
                 transportation, and smart cities.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
-                <Link
-                  href="/contact"
+                <a
+                  href="https://www.sagire.ai/platforms"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-red-700 transition-colors duration-200"
                 >
                   Order Now
                   <Right className="ml-2" />
-                </Link>
+                </a>
                 <Link
                   href="/product"
                   className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-8 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 transition-colors duration-200"

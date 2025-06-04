@@ -117,7 +117,7 @@ export default function RootLayout({
                   </a>
                 </div>
                 <p className="mt-8 text-base text-gray-400 md:mt-0 md:order-1 text-center">
-                  &copy; 2025 Inventec. All rights reserved.
+                  &copy; 2025 <a href="https://www.inventec.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-red-500 transition-colors duration-200">Inventec Corporation</a>. All rights reserved.
                 </p>
               </div>
             </div>

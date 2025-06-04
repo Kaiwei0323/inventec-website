@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState, useMemo } from "react";
+import Image from "next/image";
 
 const MobileMenuItem = ({ href, onClick, children }) => (
   <Link
@@ -66,12 +67,15 @@ export default function Header() {
     <header className="bg-white border-b">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link className="flex items-center space-x-2" href="/" aria-label="Inventec Home">
-            <span className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-600 bg-clip-text text-transparent">
-              Inventec
-            </span>
-          </Link>
+        <Link className="flex items-center space-x-2" href="/" aria-label="Inventec Home">
+          <Image
+            src="/Inventec_Logo.jpg"
+            alt="Inventec Logo"
+            width={200}
+            height={200}
+          />
+        </Link>
+
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8" aria-label="Main navigation">
