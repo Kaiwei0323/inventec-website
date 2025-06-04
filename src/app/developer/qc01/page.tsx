@@ -27,7 +27,6 @@ export default function QC01DeveloperPage() {
           <li><a href="#image-reflash" className="text-[#f60d0d] hover:underline">Image Reflash</a></li>
           <li><a href="#demo-app" className="text-[#f60d0d] hover:underline">Demo Application</a></li>
           <li><a href="#conversion-tool" className="text-[#f60d0d] hover:underline">Model Conversion Toolkit</a></li>
-          <li><a href="#support" className="text-[#f60d0d] hover:underline">Support</a></li>
         </ul>
       </nav>
 
@@ -40,7 +39,7 @@ export default function QC01DeveloperPage() {
         </p>
         <li>
           <Link
-            href="/download/userguide/qc01/QC01W-UserGuide-v1.0.pdf"
+            href="/download/userguide/qualcomm/qc01/QC01W-UserGuide-v1.0.pdf"
             download
             className="text-[#f60d0d] hover:underline"
           >
