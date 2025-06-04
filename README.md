@@ -57,6 +57,7 @@ User → Rate Limiter → APIs → Server → MongoDB
 ---
 
 ## Getting Started
+### Build locally
 1️. Install dependencies
 ```
 npm install
@@ -67,8 +68,14 @@ npm run dev
 ```
 App will be available at http://localhost:3000
 
+### Build with docker
+```
+docker build -t my-app .
+docker run -p 3000:3000 my-app
+```
+
 ---
 
 ## Notes
-* Ensure your MongoDB URI and environment variables are correctly configured in a .env.local file.
+* Ensure your MongoDB URI and environment variables are correctly configured in a .env file.
 * User roles determine access to product creation/edit/delete features.
