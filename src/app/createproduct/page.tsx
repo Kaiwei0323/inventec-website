@@ -1,6 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react';
 
+interface Product {
+  _id: string;
+  name?: string;
+  imageUrl?: string;
+  description?: string;
+  chip?: string;
+  support?: string[];
+  tops?: string | number;
+  category?: string;
+  platform?: string;
+  downloadUrl?: string;
+  detailPage?: string;
+}
+
 export default function CreateProductPage() {
   const [name, setName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
@@ -10,15 +24,15 @@ export default function CreateProductPage() {
   const [tops, setTops] = useState('');
   const [category, setCategory] = useState('');
   const [platform, setPlatform] = useState('');
-  const [downloadUrl, setdownloadUrl] = useState('');
-  const [detailPage, setdetailPage] = useState('');
+  const [downloadUrl, setDownloadUrl] = useState('');
+  const [detailPage, setDetailPage] = useState('');
 
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
   const [error, setError] = useState(false);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -29,7 +43,7 @@ export default function CreateProductPage() {
     try {
       const res = await fetch('/api/product');
       if (res.ok) {
-        const data = await res.json();
+        const data: Product[] = await res.json();
         setProducts(data);
       }
     } catch {
@@ -37,7 +51,7 @@ export default function CreateProductPage() {
     }
   }
 
-  async function handleSubmit(ev) {
+  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     setCreating(true);
     setError(false);
@@ -59,7 +73,7 @@ export default function CreateProductPage() {
     };
 
     try {
-      let response;
+      let response: Response;
       if (editingId) {
         response = await fetch(`/api/product?id=${editingId}`, {
           method: 'PUT',
@@ -97,29 +111,29 @@ export default function CreateProductPage() {
     setTops('');
     setCategory('');
     setPlatform('');
-    setdownloadUrl('');
-    setdetailPage('');
+    setDownloadUrl('');
+    setDetailPage('');
     setEditingId(null);
     setIsEditing(false);
   }
 
-  function handleEdit(prod) {
+  function handleEdit(prod: Product) {
     setEditingId(prod._id);
     setName(prod.name || '');
     setImageUrl(prod.imageUrl || '');
     setDescription(prod.description || '');
     setChip(prod.chip || '');
     setSupport((prod.support || []).join(', '));
-    setTops(prod.tops || '');
+    setTops(prod.tops?.toString() || '');
     setCategory(prod.category || '');
     setPlatform(prod.platform || '');
-    setdownloadUrl(prod.downloadUrl || '');
-    setdetailPage(prod.detailPage || '');
+    setDownloadUrl(prod.downloadUrl || '');
+    setDetailPage(prod.detailPage || '');
     setIsEditing(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  async function handleDelete(productId) {
+  async function handleDelete(productId: string) {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
@@ -160,11 +174,25 @@ export default function CreateProductPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" placeholder="Product Name" value={name} disabled={creating}
-          onChange={e => setName(e.target.value)} required className="w-full border rounded-xl p-3" />
+        <input
+          type="text"
+          placeholder="Product Name"
+          value={name}
+          disabled={creating}
+          onChange={e => setName(e.target.value)}
+          required
+          className="w-full border rounded-xl p-3"
+        />
 
-        <input type="text" placeholder="Image URL" value={imageUrl} disabled={creating}
-          onChange={e => setImageUrl(e.target.value)} required className="w-full border rounded-xl p-3" />
+        <input
+          type="text"
+          placeholder="Image URL"
+          value={imageUrl}
+          disabled={creating}
+          onChange={e => setImageUrl(e.target.value)}
+          required
+          className="w-full border rounded-xl p-3"
+        />
 
         {imageUrl && (
           <div className="w-full mb-2">
@@ -172,29 +200,82 @@ export default function CreateProductPage() {
           </div>
         )}
 
-        <textarea placeholder="Description" value={description} disabled={creating}
-          onChange={e => setDescription(e.target.value)} rows={4} required className="w-full border rounded-xl p-3" />
+        <textarea
+          placeholder="Description"
+          value={description}
+          disabled={creating}
+          onChange={e => setDescription(e.target.value)}
+          rows={4}
+          required
+          className="w-full border rounded-xl p-3"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input type="text" placeholder="Chip" value={chip} disabled={creating}
-            onChange={e => setChip(e.target.value)} className="border rounded-xl p-3 w-full" />
-          <input type="text" placeholder="Support (comma separated)" value={support} disabled={creating}
-            onChange={e => setSupport(e.target.value)} className="border rounded-xl p-3 w-full" />
-          <input type="number" placeholder="TOPS" value={tops} disabled={creating}
-            onChange={e => setTops(e.target.value)} min={0} className="border rounded-xl p-3 w-full" />
-          <input type="text" placeholder="Category" value={category} disabled={creating}
-            onChange={e => setCategory(e.target.value)} className="border rounded-xl p-3 w-full" />
-          <input type="text" placeholder="Platform" value={platform} disabled={creating}
-            onChange={e => setPlatform(e.target.value)} className="border rounded-xl p-3 w-full" />
-          <input type="text" placeholder="User Manual Download URL" value={downloadUrl} disabled={creating}
-            onChange={e => setdownloadUrl(e.target.value)} className="border rounded-xl p-3 w-full" />
-          <input type="text" placeholder="Detail Page" value={detailPage} disabled={creating}
-            onChange={e => setdetailPage(e.target.value)} className="border rounded-xl p-3 w-full" />
+          <input
+            type="text"
+            placeholder="Chip"
+            value={chip}
+            disabled={creating}
+            onChange={e => setChip(e.target.value)}
+            className="border rounded-xl p-3 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Support (comma separated)"
+            value={support}
+            disabled={creating}
+            onChange={e => setSupport(e.target.value)}
+            className="border rounded-xl p-3 w-full"
+          />
+          <input
+            type="number"
+            placeholder="TOPS"
+            value={tops}
+            disabled={creating}
+            onChange={e => setTops(e.target.value)}
+            min={0}
+            className="border rounded-xl p-3 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Category"
+            value={category}
+            disabled={creating}
+            onChange={e => setCategory(e.target.value)}
+            className="border rounded-xl p-3 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Platform"
+            value={platform}
+            disabled={creating}
+            onChange={e => setPlatform(e.target.value)}
+            className="border rounded-xl p-3 w-full"
+          />
+          <input
+            type="text"
+            placeholder="User Manual Download URL"
+            value={downloadUrl}
+            disabled={creating}
+            onChange={e => setDownloadUrl(e.target.value)}
+            className="border rounded-xl p-3 w-full"
+          />
+          <input
+            type="text"
+            placeholder="Detail Page"
+            value={detailPage}
+            disabled={creating}
+            onChange={e => setDetailPage(e.target.value)}
+            className="border rounded-xl p-3 w-full"
+          />
         </div>
 
         <div className="flex gap-4">
-          <button type="submit" disabled={creating}
-            className="w-full text-white bg-primary hover:bg-opacity-90 transition px-6 py-3 rounded-xl font-semibold">
+          <button
+            type="submit"
+            disabled={creating}
+            className="w-full text-white bg-primary hover:bg-opacity-90 transition px-6 py-3 rounded-xl font-semibold"
+          >
             {creating ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Product' : 'Create Product')}
           </button>
           {isEditing && (
@@ -212,8 +293,11 @@ export default function CreateProductPage() {
           {products.map(prod => (
             <div key={prod._id} className="border rounded-xl p-4 shadow hover:shadow-md transition relative">
               {prod.imageUrl && (
-                <img src={prod.imageUrl} alt={prod.name}
-                  className="mb-4 w-full max-h-48 object-contain rounded" />
+                <img
+                  src={prod.imageUrl}
+                  alt={prod.name}
+                  className="mb-4 w-full max-h-48 object-contain rounded"
+                />
               )}
               <h3 className="text-lg font-bold mb-2">{prod.name}</h3>
               <p className="text-sm text-gray-600 mb-2">{prod.description}</p>

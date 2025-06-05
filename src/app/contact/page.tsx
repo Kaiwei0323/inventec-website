@@ -19,7 +19,12 @@ export default function ContactPage() {
   );
 }
 
-function ContactCard({ name, email }) {
+type ContactCardProps = {
+  name: string;
+  email: string;
+};
+
+function ContactCard( { name, email }: ContactCardProps ) {
   return (
     <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition">
       <p className="text-gray-700 font-medium">{name}</p>
