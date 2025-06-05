@@ -64,7 +64,8 @@ npm install
 ```
 2. Start the development server
 ```
-npm run dev
+npm run build
+npm start
 ```
 App will be available at http://localhost:3000
 
