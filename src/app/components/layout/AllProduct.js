@@ -35,6 +35,11 @@ export default function AllProductMenu({ platform }) {
     ? products.filter((p) => p.platform === platform)
     : products;
 
+  // Sort by TOPS (lowest to highest)
+  const sortedProducts = [...filteredProducts].sort(
+    (a, b) => Number(a.tops) - Number(b.tops)
+  );
+
   return (
     <section>
       <div className="text-center mt-6">
@@ -61,7 +66,7 @@ export default function AllProductMenu({ platform }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-4">
-        {filteredProducts.map((product) => (
+        {sortedProducts.map((product) => (
           <ProductItem
             key={product._id}
             name={product.name}
