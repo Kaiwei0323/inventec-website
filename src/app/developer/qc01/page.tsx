@@ -8,7 +8,7 @@ export default function QC01DeveloperPage() {
       {/* Page Header */}
       <DeveloperCommon />
       <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-center">QCS6490 Developer Portal</h1>
+        <h1 className="text-3xl font-bold text-center">QC01 Developer Portal</h1>
         <p className="text-lg text-gray-600 mt-5">Your all-in-one hub for development, deployment, and optimization.</p>
       </header>
 
@@ -34,7 +34,7 @@ export default function QC01DeveloperPage() {
       <section id="user-manual">
         <h2 className="text-2xl font-semibold text-[#f60d0d] mb-3 mt-5">1. User Manual</h2>
         <p className="text-gray-700 mb-4">
-          Access our user guide for step-by-step instructions on setting up your QCS6490 system, flashing firmware,
+          Access our user guide for step-by-step instructions on setting up your QC01 system, flashing firmware,
           and preparing the development environment.
         </p>
         <li>
@@ -43,7 +43,7 @@ export default function QC01DeveloperPage() {
             download
             className="text-[#f60d0d] hover:underline"
           >
-            Download QCS6490 User Manual
+            Download QC01 User Manual
           </Link>
         </li>
       </section>
