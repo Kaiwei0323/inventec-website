@@ -49,7 +49,8 @@ export default function Header() {
     { href: "/product", label: "Products" },
     ...(isAdmin ? [
       { href: "/createproduct", label: "Create Product" },
-      { href: "/stock", label: "Stock" }
+      { href: "/stock", label: "Stock" },
+      { href: "/shipments", label: "Shipments" }
     ] : []),
     { href: "/developer", label: "Developer" },
     { href: "/about", label: "About" },

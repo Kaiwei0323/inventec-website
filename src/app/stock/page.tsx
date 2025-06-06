@@ -1,5 +1,7 @@
 'use client';
 import { useState, useEffect } from "react";
+import ShipmentForm from "../components/ShipmentForm";
+import AddStockForm from "../components/AddStockForm";
 
 interface StockItem {
   _id: string;
@@ -53,11 +55,16 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<StockItem | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editQuantity, setEditQuantity] = useState('');
+  const [editItem, setEditItem] = useState<{ name: string; sku: string; quantity: string }>({
+    name: '',
+    sku: '',
+    quantity: ''
+  });
   const [editError, setEditError] = useState('');
 
   async function fetchStocks() {
@@ -84,12 +91,16 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
 
   function handleEditClick(stock: StockItem) {
     setEditingId(stock._id);
-    setEditQuantity(stock.quantity.toString());
+    setEditItem({
+      name: stock.name,
+      sku: stock.sku,
+      quantity: stock.quantity.toString()
+    });
     setEditError('');
   }
 
-  async function handleQuantityUpdate(stockId: string) {
-    const quantityNum = parseInt(editQuantity);
+  async function handleItemUpdate(stockId: string) {
+    const quantityNum = parseInt(editItem.quantity);
     if (isNaN(quantityNum) || quantityNum < 0) {
       setEditError('Please enter a valid quantity');
       return;
@@ -98,24 +109,36 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
       setEditError('Quantity cannot be zero');
       return;
     }
+    if (!editItem.name.trim()) {
+      setEditError('Product name cannot be empty');
+      return;
+    }
+    if (!editItem.sku.trim()) {
+      setEditError('SKU cannot be empty');
+      return;
+    }
 
     try {
       const res = await fetch(`/api/stock?id=${stockId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: quantityNum }),
+        body: JSON.stringify({
+          name: editItem.name,
+          sku: editItem.sku,
+          quantity: quantityNum
+        }),
       });
 
       if (!res.ok) {
-        throw new Error('Failed to update quantity');
+        throw new Error('Failed to update item');
       }
 
       setEditingId(null);
-      setEditQuantity('');
+      setEditItem({ name: '', sku: '', quantity: '' });
       setEditError('');
       onStockChange();
     } catch (err) {
-      setEditError('Failed to update quantity');
+      setEditError('Failed to update item');
     }
   }
 
@@ -143,44 +166,81 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
     }
   }
 
+  function filterStocks(stocks: StockItem[], query: string) {
+    if (!query) return stocks;
+    const lowerQuery = query.toLowerCase();
+    return stocks.filter(stock => 
+      stock.name.toLowerCase().includes(lowerQuery) ||
+      stock.sku.toLowerCase().includes(lowerQuery)
+    );
+  }
+
   function renderTable(title: string, filteredStocks: StockItem[]) {
+    const sortedStocks = [...filteredStocks].sort((a, b) => 
+      a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+    );
+
     return (
-      <div className="mb-10 bg-white rounded-lg shadow-sm border">
+      <div className="bg-white rounded-lg shadow-sm border">
         <div className="px-6 py-4 border-b">
           <h2 className="text-xl font-semibold text-gray-800">{title} Stock</h2>
         </div>
-        {filteredStocks.length === 0 ? (
-          <div className="p-6 text-gray-500 text-center">No stock items in this location.</div>
+        {sortedStocks.length === 0 ? (
+          <div className="p-6 text-gray-500 text-center">
+            {searchQuery ? 'No matching items found.' : 'No stock items in this location.'}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">Product Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">SKU</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Quantity</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Last Updated</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStocks.map((stock) => (
+                {sortedStocks.map((stock) => (
                   <tr key={stock._id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{stock.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{stock.sku}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {editingId === stock._id ? (
+                        <input
+                          type="text"
+                          value={editItem.name}
+                          onChange={(e) => setEditItem({ ...editItem, name: e.target.value })}
+                          className="w-full p-1 border rounded focus:ring-2 focus:ring-primary focus:border-primary"
+                        />
+                      ) : (
+                        stock.name
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {editingId === stock._id ? (
+                        <input
+                          type="text"
+                          value={editItem.sku}
+                          onChange={(e) => setEditItem({ ...editItem, sku: e.target.value })}
+                          className="w-full p-1 border rounded focus:ring-2 focus:ring-primary focus:border-primary"
+                        />
+                      ) : (
+                        stock.sku
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {editingId === stock._id ? (
                         <div className="flex flex-col space-y-2">
                           <div className="flex items-center space-x-2">
                             <input
                               type="number"
-                              value={editQuantity}
-                              onChange={(e) => setEditQuantity(e.target.value)}
+                              value={editItem.quantity}
+                              onChange={(e) => setEditItem({ ...editItem, quantity: e.target.value })}
                               min={0}
                               className="w-20 p-1 border rounded focus:ring-2 focus:ring-primary focus:border-primary"
                             />
                             <button
-                              onClick={() => handleQuantityUpdate(stock._id)}
+                              onClick={() => handleItemUpdate(stock._id)}
                               className="text-green-600 hover:text-green-900 font-medium"
                             >
                               Save
@@ -188,7 +248,7 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
                             <button
                               onClick={() => {
                                 setEditingId(null);
-                                setEditQuantity('');
+                                setEditItem({ name: '', sku: '', quantity: '' });
                                 setEditError('');
                               }}
                               className="text-gray-600 hover:text-gray-900 font-medium"
@@ -256,11 +316,47 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
     );
   }
 
-  const isvStocks = stocks.filter(stock => stock.location === 'ISV');
-  const houstonStocks = stocks.filter(stock => stock.location === 'Houston');
+  const isvStocks = filterStocks(stocks.filter(stock => stock.location === 'ISV'), searchQuery);
+  const houstonStocks = filterStocks(stocks.filter(stock => stock.location === 'Houston'), searchQuery);
 
   return (
     <div className="space-y-8">
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="px-6 py-5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center space-x-2">
+              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Search products by name or SKU..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full md:w-96 px-4 py-2 text-gray-700 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
+              />
+            </div>
+            <div className="flex items-center text-sm text-gray-500">
+              {searchQuery && (
+                <div className="flex items-center space-x-2">
+                  <span>
+                    Found: {isvStocks.length + houstonStocks.length} items
+                  </span>
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                  >
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {renderTable('ISV', isvStocks)}
       {renderTable('Houston', houstonStocks)}
 
@@ -278,143 +374,54 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
 }
 
 export default function StockPage() {
-  const [name, setName] = useState('');
-  const [sku, setSku] = useState('');
-  const [quantity, setQuantity] = useState('');
-  const [location, setLocation] = useState('ISV');
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
-  const [stockChangeCounter, setStockChangeCounter] = useState(0);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showShipmentForm, setShowShipmentForm] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  async function handleFormSubmit(ev: React.FormEvent<HTMLFormElement>) {
-    ev.preventDefault();
-    
-    const quantityNum = parseInt(quantity);
-    if (isNaN(quantityNum) || quantityNum < 1) {
-      setError('Quantity must be at least 1');
-      return;
-    }
+  const handleStockChange = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
 
-    setSubmitting(true);
-    setSuccess(false);
-    setError('');
-
-    const stockData = {
-      name,
-      sku,
-      quantity: quantityNum,
-      location
-    };
-
-    try {
-      const res = await fetch('/api/stock', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stockData),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setSuccess(true);
-        setName('');
-        setSku('');
-        setQuantity('');
-        setLocation('ISV');
-        setStockChangeCounter(prev => prev + 1);
-      } else {
-        setError(data.error || 'Something went wrong.');
-      }
-    } catch (err) {
-      setError('Failed to connect to the server. Please try again.');
-    } finally {
-      setSubmitting(false);
-    }
-  }
+  const handleShipmentComplete = () => {
+    setShowShipmentForm(false);
+    handleStockChange();
+  };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Stock Management</h1>
-      </div>
-
-      {success && (
-        <div className="mb-8 bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-green-600 text-center">Stock item successfully created!</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-8 bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600 text-center">{error}</p>
-        </div>
-      )}
-
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-        <h2 className="text-center text-2xl font-bold text-gray-800 mb-6">Add New Stock</h2>
-        <form className="max-w-md mx-auto space-y-4" onSubmit={handleFormSubmit}>
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={ev => setName(ev.target.value)}
-              required
-              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-              placeholder="Enter product name"
-            />
-          </div>
-          <div>
-            <label htmlFor="sku" className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
-            <input
-              id="sku"
-              type="text"
-              value={sku}
-              onChange={ev => setSku(ev.target.value)}
-              required
-              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-              placeholder="Enter SKU"
-            />
-          </div>
-          <div>
-            <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-            <input
-              id="quantity"
-              type="number"
-              value={quantity}
-              onChange={ev => setQuantity(ev.target.value)}
-              required
-              min={1}
-              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-primary [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              placeholder="Enter quantity"
-            />
-          </div>
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <select
-              id="location"
-              value={location}
-              onChange={ev => setLocation(ev.target.value)}
-              required
-              className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-primary bg-white"
-            >
-              <option value="ISV">ISV</option>
-              <option value="Houston">Houston</option>
-            </select>
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Stock Management</h1>
+        <div className="space-x-4">
           <button
-            type="submit"
-            disabled={submitting}
-            className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            onClick={() => setShowShipmentForm(!showShipmentForm)}
+            className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark"
           >
-            {submitting ? 'Adding...' : 'Add Stock'}
+            {showShipmentForm ? 'Hide Shipment Form' : 'Create Shipment'}
           </button>
-        </form>
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary-dark"
+          >
+            {showAddForm ? 'Hide Add Form' : 'Add Stock'}
+          </button>
+        </div>
       </div>
 
-      <StockOverview onStockChange={() => setStockChangeCounter(prev => prev + 1)} />
-    </section>
+      {showShipmentForm && (
+        <div className="mb-8">
+          <ShipmentForm onShipmentComplete={handleShipmentComplete} />
+        </div>
+      )}
+
+      {showAddForm && (
+        <div className="mb-8">
+          <AddStockForm onStockAdded={handleStockChange} />
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 gap-8">
+        <StockOverview onStockChange={() => handleStockChange()} />
+      </div>
+    </div>
   );
 }
