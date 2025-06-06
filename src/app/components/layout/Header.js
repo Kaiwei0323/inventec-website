@@ -18,7 +18,6 @@ const MobileMenuItem = ({ href, onClick, children }) => (
 export default function Header() {
   const session = useSession();
   const status = session.status;
-  const [hasRedirected, setHasRedirected] = useState(false);
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -31,16 +30,6 @@ export default function Header() {
     console.log("Session status:", status);
     console.log("Session data:", session.data);
   }, [status, session.data]);
-
-  useEffect(() => {
-    if (status === "authenticated" && !hasRedirected) {
-      router.push("/");
-      setHasRedirected(true);
-    }
-    if (status === "unauthenticated") {
-      setHasRedirected(false);
-    }
-  }, [status, hasRedirected, router]);
 
   const linkStyle = useMemo(() => 
     "hover:text-primary hover:underline transition-colors duration-200 text-gray-600 font-medium",
@@ -57,7 +46,10 @@ export default function Header() {
   const navigationLinks = useMemo(() => [
     { href: "/", label: "Home" },
     { href: "/product", label: "Products" },
-    ...(isAdmin ? [{ href: "/createproduct", label: "Create Product" }] : []),
+    ...(isAdmin ? [
+      { href: "/createproduct", label: "Create Product" },
+      { href: "/stock", label: "Stock" }
+    ] : []),
     { href: "/developer", label: "Developer" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
