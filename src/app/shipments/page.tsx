@@ -28,10 +28,9 @@ interface Inquiry {
   contact: string;
   items: InquiryItem[];
   createdAt: string;
+  submitter: string;
+  status: 'requested' | 'processing' | 'complete';
   completedAt?: string;
-  fulfilled: boolean;
-  fulfilledAt?: string;
-  updatedAt?: string;
 }
 
 // Move getStatusColor function outside components so it can be used by both
@@ -460,7 +459,7 @@ export default function ShipmentsPage() {
       <section className="mt-16">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Customer Inquiry History</h2>
         {completedInquiries.length === 0 ? (
-          <div className="text-gray-500">No fulfilled customer inquiries found.</div>
+          <div className="text-gray-500">No completed customer inquiries found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 bg-white rounded-lg shadow">
