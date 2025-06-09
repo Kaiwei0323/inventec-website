@@ -24,6 +24,7 @@ const InquirySchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   fulfilled: { type: Boolean, default: false },
   fulfilledAt: { type: Date },
+  submitter: { type: String, required: true },
 });
 
 export default mongoose.models.Inquiry || mongoose.model('Inquiry', InquirySchema); 

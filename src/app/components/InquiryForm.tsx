@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 interface InquiryItem {
   productId: string;
@@ -24,6 +25,7 @@ export default function InquiryForm() {
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const { data: session } = useSession();
 
   useEffect(() => {
     fetch("/api/product")
@@ -75,7 +77,7 @@ export default function InquiryForm() {
       const response = await fetch("/api/inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ company, contact, items }),
+        body: JSON.stringify({ company, contact, items, submitter: session?.user?.email }),
       });
       if (!response.ok) {
         const data = await response.json();

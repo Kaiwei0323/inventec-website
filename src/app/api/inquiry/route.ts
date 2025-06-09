@@ -9,8 +9,8 @@ export async function POST(req: Request) {
       await mongoose.connect(process.env.MONGODB_URI!);
     }
     const body = await req.json();
-    const { company, contact, items } = body;
-    if (!company || !contact || !Array.isArray(items) || items.length === 0) {
+    const { company, contact, items, submitter } = body;
+    if (!company || !contact || !Array.isArray(items) || items.length === 0 || !submitter) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
     // Validate product IDs
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 404 });
       }
     }
-    const inquiry = await Inquiry.create({ company, contact, items });
+    const inquiry = await Inquiry.create({ company, contact, items, submitter });
     return NextResponse.json({ success: true, inquiry });
   } catch (err: any) {
     console.error('Inquiry API error:', err);
