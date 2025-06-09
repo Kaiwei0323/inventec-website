@@ -121,6 +121,7 @@ export default function InquiryForm() {
             />
           </div>
         </div>
+
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Product Details</h3>
@@ -132,13 +133,14 @@ export default function InquiryForm() {
               Add Product
             </button>
           </div>
+
           {items.map((item, index) => (
             <div
               key={index}
-              className="flex flex-col md:flex-row md:items-end gap-4 p-4 border rounded-md bg-gray-50 mb-4"
+              className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 border rounded-md bg-gray-50 items-start"
             >
-              <div className="flex-1 min-w-[180px]">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
+              <div className="md:col-span-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Product</label>
                 <select
                   value={item.productId}
                   onChange={(e) => updateItem(index, "productId", e.target.value)}
@@ -151,8 +153,11 @@ export default function InquiryForm() {
                   ))}
                 </select>
               </div>
-              <div className="md:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 mb-1">SKU <span className="text-gray-400 text-xs">(optional)</span></label>
+
+              <div className="md:col-span-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  SKU <span className="text-gray-400 text-xs">(optional)</span>
+                </label>
                 <input
                   type="text"
                   value={item.sku || ""}
@@ -161,8 +166,9 @@ export default function InquiryForm() {
                   placeholder="Enter SKU"
                 />
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+
+              <div className="md:col-span-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
                 <input
                   type="number"
                   min="1"
@@ -172,8 +178,9 @@ export default function InquiryForm() {
                   className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
                 />
               </div>
+
               {items.length > 1 && (
-                <div className="md:col-span-1 flex items-center justify-end">
+                <div className="md:col-span-1 flex items-center pt-6">
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
@@ -186,8 +193,10 @@ export default function InquiryForm() {
             </div>
           ))}
         </div>
+
         {error && <div className="text-sm text-red-600">{error}</div>}
         {success && <div className="text-sm text-green-600">{success}</div>}
+
         <div className="flex justify-end">
           <button
             type="submit"
