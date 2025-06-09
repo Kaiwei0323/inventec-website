@@ -28,8 +28,10 @@ interface Inquiry {
   contact: string;
   items: InquiryItem[];
   createdAt: string;
+  completedAt?: string;
   fulfilled: boolean;
   fulfilledAt?: string;
+  updatedAt?: string;
 }
 
 // Move getStatusColor function outside components so it can be used by both
@@ -151,7 +153,7 @@ export default function ShipmentsPage() {
       const res = await fetch('/api/inquiry');
       if (!res.ok) throw new Error('Failed to fetch inquiries');
       const data = await res.json();
-      setInquiries(data.filter((inq: Inquiry) => inq.fulfilled));
+      setInquiries(data);
     } catch (err) {
       // Optionally set error
     }
@@ -337,6 +339,8 @@ export default function ShipmentsPage() {
     </div>
   );
 
+  const completedInquiries = inquiries.filter((inq: any) => (inq.status || 'requested') === 'complete');
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Shipment Management</h1>
@@ -452,10 +456,10 @@ export default function ShipmentsPage() {
         shipmentDetails={shipmentToDelete}
       />
 
-      {/* Customer Inquiries Section */}
+      {/* Customer Inquiry History Section */}
       <section className="mt-16">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Customer Inquiry History</h2>
-        {inquiries.length === 0 ? (
+        {completedInquiries.length === 0 ? (
           <div className="text-gray-500">No fulfilled customer inquiries found.</div>
         ) : (
           <div className="overflow-x-auto">
@@ -466,12 +470,12 @@ export default function ShipmentsPage() {
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Products</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fulfilled At</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Completed At</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {inquiries.map((inq) => (
+                {completedInquiries.map((inq) => (
                   <tr key={inq._id}>
                     <td className="px-4 py-2 whitespace-nowrap">{inq.company}</td>
                     <td className="px-4 py-2 whitespace-nowrap">{inq.contact}</td>
@@ -487,7 +491,9 @@ export default function ShipmentsPage() {
                       </ul>
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">{new Date(inq.createdAt).toLocaleString()}</td>
-                    <td className="px-4 py-2 whitespace-nowrap">{inq.fulfilledAt ? new Date(inq.fulfilledAt).toLocaleString() : '-'}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{
+                      inq.completedAt ? new Date(inq.completedAt).toLocaleString() : new Date(inq.createdAt).toLocaleString()
+                    }</td>
                     <td className="px-4 py-2 whitespace-nowrap">
                       <button
                         onClick={() => handleDeleteInquiry(inq._id)}

@@ -22,9 +22,9 @@ const InquirySchema = new mongoose.Schema({
   contact: { type: String, required: true },
   items: [InquiryItemSchema],
   createdAt: { type: Date, default: Date.now },
-  fulfilled: { type: Boolean, default: false },
-  fulfilledAt: { type: Date },
   submitter: { type: String, required: true },
+  status: { type: String, enum: ['requested', 'processing', 'complete'], default: 'requested' },
+  completedAt: { type: Date },
 });
 
 export default mongoose.models.Inquiry || mongoose.model('Inquiry', InquirySchema); 

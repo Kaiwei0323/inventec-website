@@ -14,6 +14,8 @@ interface Inquiry {
   contact: string;
   items: InquiryItem[];
   createdAt: string;
+  submitter?: string;
+  status: 'requested' | 'processing' | 'complete';
 }
 
 export default function InquiryForm() {
@@ -26,6 +28,7 @@ export default function InquiryForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const { data: session } = useSession();
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/product")
@@ -92,6 +95,27 @@ export default function InquiryForm() {
       setError(err.message || "Failed to submit inquiry. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Filter inquiries to only those submitted by the current user
+  const userInquiries = session?.user?.email ? inquiries.filter(inq => inq.submitter === session?.user?.email) : [];
+
+  // Add a type guard for productId
+  function isPopulatedProduct(productId: unknown): productId is { _id: string; name?: string; sku?: string } {
+    return typeof productId === 'object' && productId !== null && '_id' in productId;
+  }
+
+  const handleCancelInquiry = async (id: string) => {
+    setCancellingId(id);
+    try {
+      const res = await fetch(`/api/inquiry?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to cancel inquiry');
+      setInquiries(inquiries.filter(inq => inq._id !== id));
+    } catch (err) {
+      // Optionally show error
+    } finally {
+      setCancellingId(null);
     }
   };
 
@@ -209,6 +233,55 @@ export default function InquiryForm() {
           </button>
         </div>
       </form>
+      {/* Show user's own inquiries */}
+      <div className="mt-10">
+        <h3 className="text-lg font-semibold mb-4">Your Inquiries</h3>
+        {userInquiries.length === 0 ? (
+          <div className="text-gray-500">No inquiries found.</div>
+        ) : (
+          <ul className="space-y-4">
+            {userInquiries.map((inq) => {
+              const status = inq.status || 'requested';
+              return (
+                <li key={inq._id} className="border rounded p-4 bg-gray-50">
+                  <div><span className="font-medium">Company:</span> {inq.company}</div>
+                  <div><span className="font-medium">Contact:</span> {inq.contact}</div>
+                  <div><span className="font-medium">Submitted:</span> {new Date(inq.createdAt).toLocaleString()}</div>
+                  <div>
+                    <span className="font-medium">Products:</span>
+                    <ul className="ml-4 list-disc">
+                      {inq.items.map((item, idx) => (
+                        <li key={idx}>
+                          Product: {isPopulatedProduct(item.productId) ? item.productId.name || item.productId._id : item.productId}
+                          {isPopulatedProduct(item.productId) && item.productId.sku ? ` (SKU: ${item.productId.sku})` : ''},
+                          Quantity: {item.quantity},
+                          SKU: {item.sku || 'N/A'}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className={
+                    status === 'requested' ? 'mt-4 text-yellow-600 font-semibold' :
+                    status === 'processing' ? 'mt-4 text-blue-600 font-semibold' :
+                    'mt-4 text-green-600 font-semibold'
+                  }>
+                    Status: {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </div>
+                  {status === 'requested' && (
+                    <button
+                      onClick={() => handleCancelInquiry(inq._id)}
+                      disabled={cancellingId === inq._id}
+                      className="mt-4 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 disabled:opacity-50"
+                    >
+                      {cancellingId === inq._id ? 'Cancelling...' : 'Cancel'}
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

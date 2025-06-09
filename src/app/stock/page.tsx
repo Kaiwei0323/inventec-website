@@ -24,7 +24,8 @@ interface Inquiry {
   contact: string;
   items: InquiryItem[];
   createdAt: string;
-  fulfilled: boolean;
+  status: 'requested' | 'processing' | 'complete';
+  submitter?: string;
 }
 
 function DeleteConfirmationModal({ 
@@ -391,6 +392,8 @@ export default function StockPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [deletingInquiryId, setDeletingInquiryId] = useState<string | null>(null);
   const [fulfillingInquiryId, setFulfillingInquiryId] = useState<string | null>(null);
+  const [processingInquiryId, setProcessingInquiryId] = useState<string | null>(null);
+  const [inquirySearch, setInquirySearch] = useState('');
 
   const handleStockChange = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -442,6 +445,30 @@ export default function StockPage() {
     }
   }
 
+  async function handleProcessInquiry(id: string) {
+    setProcessingInquiryId(id);
+    try {
+      const res = await fetch(`/api/inquiry?id=${id}&action=process`, { method: 'PATCH' });
+      if (!res.ok) throw new Error('Failed to set inquiry to processing');
+      setInquiries(inquiries.map(inq => inq._id === id ? { ...inq, status: 'processing' } : inq));
+    } catch (err) {
+      // Optionally show error
+    } finally {
+      setProcessingInquiryId(null);
+    }
+  }
+
+  // Filter inquiries by company or contact and not complete
+  const filteredInquiries = inquiries.filter(inq => {
+    if (inq.status === 'complete') return false;
+    if (!inquirySearch.trim()) return true;
+    const q = inquirySearch.trim().toLowerCase();
+    return (
+      inq.company.toLowerCase().includes(q) ||
+      inq.contact.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
@@ -477,7 +504,16 @@ export default function StockPage() {
       {/* Customer Inquiries Section */}
       <section className="mb-16">
         <h2 className="text-2xl font-bold mb-6 text-gray-800">Customer Inquiries</h2>
-        {inquiries.filter(inq => !inq.fulfilled).length === 0 ? (
+        <div className="mb-4 flex items-center">
+          <input
+            type="text"
+            placeholder="Search by company or contact..."
+            value={inquirySearch}
+            onChange={e => setInquirySearch(e.target.value)}
+            className="w-full md:w-96 px-4 py-2 text-gray-700 bg-gray-50 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200"
+          />
+        </div>
+        {filteredInquiries.length === 0 ? (
           <div className="text-gray-500">No customer inquiries found.</div>
         ) : (
           <div className="overflow-x-auto">
@@ -486,46 +522,70 @@ export default function StockPage() {
                 <tr>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Submitter</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Products</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {inquiries.filter(inq => !inq.fulfilled).map((inq) => (
-                  <tr key={inq._id}>
-                    <td className="px-4 py-2 whitespace-nowrap">{inq.company}</td>
-                    <td className="px-4 py-2 whitespace-nowrap">{inq.contact}</td>
-                    <td className="px-4 py-2 whitespace-nowrap">{new Date(inq.createdAt).toLocaleString()}</td>
-                    <td className="px-4 py-2">
-                      <ul className="space-y-2">
-                        {inq.items.map((item, idx) => (
-                          <li key={idx} className="bg-gray-50 rounded p-2 border">
-                            <div><span className="font-medium">Product:</span> {typeof item.productId === 'object' ? item.productId.name : item.productId}</div>
-                            <div><span className="font-medium">SKU:</span> {item.sku || (typeof item.productId === 'object' ? item.productId.sku : '') || <span className="text-gray-400">N/A</span>}</div>
-                            <div><span className="font-medium">Quantity:</span> {item.quantity}</div>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap">
-                      <button
-                        onClick={() => handleFulfillInquiry(inq._id)}
-                        disabled={fulfillingInquiryId === inq._id}
-                        className="text-green-600 hover:text-green-900 disabled:opacity-50 mr-2"
-                      >
-                        {fulfillingInquiryId === inq._id ? 'Fulfilling...' : 'Fulfill'}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteInquiry(inq._id)}
-                        disabled={deletingInquiryId === inq._id}
-                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
-                      >
-                        {deletingInquiryId === inq._id ? 'Deleting...' : 'Delete'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredInquiries.map((inq) => {
+                  const status = inq.status || 'requested';
+                  return (
+                    <tr key={inq._id}>
+                      <td className="px-4 py-2 whitespace-nowrap">{inq.company}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{inq.contact}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{inq.submitter || '-'}</td>
+                      <td className="px-4 py-2 whitespace-nowrap">{new Date(inq.createdAt).toLocaleString()}</td>
+                      <td className="px-4 py-2">
+                        <ul className="space-y-2">
+                          {inq.items.map((item, idx) => (
+                            <li key={idx} className="bg-gray-50 rounded p-2 border">
+                              <div><span className="font-medium">Product:</span> {typeof item.productId === 'object' ? item.productId.name : item.productId}</div>
+                              <div><span className="font-medium">SKU:</span> {item.sku || (typeof item.productId === 'object' ? item.productId.sku : '') || <span className="text-gray-400">N/A</span>}</div>
+                              <div><span className="font-medium">Quantity:</span> {item.quantity}</div>
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td className={
+                        status === 'requested' ? 'px-4 py-2 text-yellow-600 font-semibold' :
+                        status === 'processing' ? 'px-4 py-2 text-blue-600 font-semibold' :
+                        'px-4 py-2 text-green-600 font-semibold'
+                      }>
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap">
+                        {status === 'requested' && (
+                          <button
+                            onClick={() => handleProcessInquiry(inq._id)}
+                            disabled={processingInquiryId === inq._id}
+                            className="text-blue-600 hover:text-blue-900 disabled:opacity-50 mr-2"
+                          >
+                            {processingInquiryId === inq._id ? 'Processing...' : 'Mark Processing'}
+                          </button>
+                        )}
+                        {(status === 'requested' || status === 'processing') && (
+                          <button
+                            onClick={() => handleFulfillInquiry(inq._id)}
+                            disabled={fulfillingInquiryId === inq._id}
+                            className="text-green-600 hover:text-green-900 disabled:opacity-50 mr-2"
+                          >
+                            {fulfillingInquiryId === inq._id ? 'Completing...' : 'Mark Complete'}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDeleteInquiry(inq._id)}
+                          disabled={deletingInquiryId === inq._id}
+                          className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                        >
+                          {deletingInquiryId === inq._id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

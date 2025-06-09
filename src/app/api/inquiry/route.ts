@@ -52,12 +52,17 @@ export async function PATCH(req: Request) {
     const { searchParams } = new URL(req.url!);
     const id = searchParams.get('id');
     const action = searchParams.get('action');
-    if (!id || action !== 'fulfill') {
+    if (!id || (action !== 'fulfill' && action !== 'process')) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
+    let newStatus = '';
+    if (action === 'fulfill') newStatus = 'complete';
+    if (action === 'process') newStatus = 'processing';
+    let updateFields: any = { status: newStatus };
+    if (action === 'fulfill') updateFields.completedAt = new Date();
     const inquiry = await Inquiry.findByIdAndUpdate(
       id,
-      { fulfilled: true, fulfilledAt: new Date() },
+      updateFields,
       { new: true }
     );
     if (!inquiry) {
@@ -66,7 +71,7 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ success: true, inquiry });
   } catch (err: any) {
     console.error('Inquiry PATCH error:', err);
-    return NextResponse.json({ error: err.message || 'Failed to fulfill inquiry' }, { status: 500 });
+    return NextResponse.json({ error: err.message || 'Failed to update inquiry status' }, { status: 500 });
   }
 }
 
