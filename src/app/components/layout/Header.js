@@ -54,8 +54,11 @@ export default function Header() {
     ] : []),
     { href: "/developer", label: "Developer" },
     { href: "/about", label: "About" },
+    ...(status === "authenticated" ? [
+      { href: "/inquiry", label: "Inquiry" }
+    ] : []),
     { href: "/contact", label: "Contact" },
-  ], [isAdmin]);
+  ], [isAdmin, status]);
 
   return (
     <header className="bg-white border-b">

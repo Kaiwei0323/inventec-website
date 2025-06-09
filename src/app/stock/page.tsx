@@ -12,6 +12,21 @@ interface StockItem {
   createdAt: string;
 }
 
+interface InquiryItem {
+  productId: { name: string; sku?: string; chip?: string; platform?: string } | string;
+  quantity: number;
+  sku?: string;
+}
+
+interface Inquiry {
+  _id: string;
+  company: string;
+  contact: string;
+  items: InquiryItem[];
+  createdAt: string;
+  fulfilled: boolean;
+}
+
 function DeleteConfirmationModal({ 
   isOpen, 
   onClose, 
@@ -111,10 +126,6 @@ function StockOverview({ onStockChange }: { onStockChange: () => void }) {
     }
     if (!editItem.name.trim()) {
       setEditError('Product name cannot be empty');
-      return;
-    }
-    if (!editItem.sku.trim()) {
-      setEditError('SKU cannot be empty');
       return;
     }
 
@@ -377,6 +388,9 @@ export default function StockPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showShipmentForm, setShowShipmentForm] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [deletingInquiryId, setDeletingInquiryId] = useState<string | null>(null);
+  const [fulfillingInquiryId, setFulfillingInquiryId] = useState<string | null>(null);
 
   const handleStockChange = () => {
     setRefreshTrigger(prev => prev + 1);
@@ -387,8 +401,49 @@ export default function StockPage() {
     handleStockChange();
   };
 
+  useEffect(() => {
+    fetchInquiries();
+  }, []);
+
+  async function fetchInquiries() {
+    try {
+      const res = await fetch('/api/inquiry');
+      if (!res.ok) throw new Error('Failed to fetch inquiries');
+      const data = await res.json();
+      setInquiries(data);
+    } catch (err) {
+      // Optionally set error
+    }
+  }
+
+  async function handleDeleteInquiry(id: string) {
+    setDeletingInquiryId(id);
+    try {
+      const res = await fetch(`/api/inquiry?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete inquiry');
+      setInquiries(inquiries.filter(inq => inq._id !== id));
+    } catch (err) {
+      // Optionally show error
+    } finally {
+      setDeletingInquiryId(null);
+    }
+  }
+
+  async function handleFulfillInquiry(id: string) {
+    setFulfillingInquiryId(id);
+    try {
+      const res = await fetch(`/api/inquiry?id=${id}&action=fulfill`, { method: 'PATCH' });
+      if (!res.ok) throw new Error('Failed to fulfill inquiry');
+      setInquiries(inquiries.filter(inq => inq._id !== id));
+    } catch (err) {
+      // Optionally show error
+    } finally {
+      setFulfillingInquiryId(null);
+    }
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Stock Management</h1>
         <div className="space-x-4">
@@ -418,6 +473,64 @@ export default function StockPage() {
           <AddStockForm onStockAdded={handleStockChange} />
         </div>
       )}
+
+      {/* Customer Inquiries Section */}
+      <section className="mb-16">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Customer Inquiries</h2>
+        {inquiries.filter(inq => !inq.fulfilled).length === 0 ? (
+          <div className="text-gray-500">No customer inquiries found.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 bg-white rounded-lg shadow">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Products</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {inquiries.filter(inq => !inq.fulfilled).map((inq) => (
+                  <tr key={inq._id}>
+                    <td className="px-4 py-2 whitespace-nowrap">{inq.company}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{inq.contact}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{new Date(inq.createdAt).toLocaleString()}</td>
+                    <td className="px-4 py-2">
+                      <ul className="space-y-2">
+                        {inq.items.map((item, idx) => (
+                          <li key={idx} className="bg-gray-50 rounded p-2 border">
+                            <div><span className="font-medium">Product:</span> {typeof item.productId === 'object' ? item.productId.name : item.productId}</div>
+                            <div><span className="font-medium">SKU:</span> {item.sku || (typeof item.productId === 'object' ? item.productId.sku : '') || <span className="text-gray-400">N/A</span>}</div>
+                            <div><span className="font-medium">Quantity:</span> {item.quantity}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <button
+                        onClick={() => handleFulfillInquiry(inq._id)}
+                        disabled={fulfillingInquiryId === inq._id}
+                        className="text-green-600 hover:text-green-900 disabled:opacity-50 mr-2"
+                      >
+                        {fulfillingInquiryId === inq._id ? 'Fulfilling...' : 'Fulfill'}
+                      </button>
+                      <button
+                        onClick={() => handleDeleteInquiry(inq._id)}
+                        disabled={deletingInquiryId === inq._id}
+                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                      >
+                        {deletingInquiryId === inq._id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <div className="grid grid-cols-1 gap-8">
         <StockOverview onStockChange={() => handleStockChange()} />

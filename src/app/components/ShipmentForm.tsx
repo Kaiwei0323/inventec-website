@@ -132,13 +132,13 @@ export default function ShipmentForm({ onShipmentComplete }: ShipmentFormProps) 
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700">SKU</label>
+                <label className="block text-sm font-medium text-gray-700">SKU <span className='text-gray-400 text-xs'>(optional)</span></label>
                 <input
                   type="text"
                   value={item.sku}
                   onChange={(e) => updateItem(index, 'sku', e.target.value)}
-                  required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+                  placeholder="Enter SKU (optional)"
                 />
               </div>
               <div className="w-32">

@@ -16,6 +16,22 @@ interface Shipment {
   createdAt: string;
 }
 
+interface InquiryItem {
+  productId: { name: string; sku?: string; chip?: string; platform?: string } | string;
+  quantity: number;
+  sku?: string;
+}
+
+interface Inquiry {
+  _id: string;
+  company: string;
+  contact: string;
+  items: InquiryItem[];
+  createdAt: string;
+  fulfilled: boolean;
+  fulfilledAt?: string;
+}
+
 // Move getStatusColor function outside components so it can be used by both
 function getStatusColor(status: string) {
   switch (status) {
@@ -109,9 +125,12 @@ export default function ShipmentsPage() {
   const [shipmentToDelete, setShipmentToDelete] = useState<Shipment | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [fromFilter, setFromFilter] = useState('');
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [deletingInquiryId, setDeletingInquiryId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchShipments();
+    fetchInquiries();
   }, []);
 
   async function fetchShipments() {
@@ -124,6 +143,17 @@ export default function ShipmentsPage() {
       setError('Failed to load shipment data');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchInquiries() {
+    try {
+      const res = await fetch('/api/inquiry');
+      if (!res.ok) throw new Error('Failed to fetch inquiries');
+      const data = await res.json();
+      setInquiries(data.filter((inq: Inquiry) => inq.fulfilled));
+    } catch (err) {
+      // Optionally set error
     }
   }
 
@@ -178,6 +208,19 @@ export default function ShipmentsPage() {
       setError(err.message || 'Failed to delete shipment');
     } finally {
       setUpdatingId(null);
+    }
+  }
+
+  async function handleDeleteInquiry(id: string) {
+    setDeletingInquiryId(id);
+    try {
+      const res = await fetch(`/api/inquiry?id=${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete inquiry');
+      setInquiries(inquiries.filter(inq => inq._id !== id));
+    } catch (err) {
+      // Optionally show error
+    } finally {
+      setDeletingInquiryId(null);
     }
   }
 
@@ -295,7 +338,7 @@ export default function ShipmentsPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Shipment Management</h1>
 
       <div className="mb-6">
@@ -408,6 +451,59 @@ export default function ShipmentsPage() {
         onConfirm={handleDeleteConfirm}
         shipmentDetails={shipmentToDelete}
       />
+
+      {/* Customer Inquiries Section */}
+      <section className="mt-16">
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Customer Inquiry History</h2>
+        {inquiries.length === 0 ? (
+          <div className="text-gray-500">No fulfilled customer inquiries found.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 bg-white rounded-lg shadow">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Products</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Submitted</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fulfilled At</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {inquiries.map((inq) => (
+                  <tr key={inq._id}>
+                    <td className="px-4 py-2 whitespace-nowrap">{inq.company}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{inq.contact}</td>
+                    <td className="px-4 py-2">
+                      <ul className="space-y-2">
+                        {inq.items.map((item, idx) => (
+                          <li key={idx} className="bg-gray-50 rounded p-2 border">
+                            <div><span className="font-medium">Product:</span> {typeof item.productId === 'object' ? item.productId.name : item.productId}</div>
+                            <div><span className="font-medium">SKU:</span> {item.sku || (typeof item.productId === 'object' ? item.productId.sku : '') || <span className="text-gray-400">N/A</span>}</div>
+                            <div><span className="font-medium">Quantity:</span> {item.quantity}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">{new Date(inq.createdAt).toLocaleString()}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">{inq.fulfilledAt ? new Date(inq.fulfilledAt).toLocaleString() : '-'}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      <button
+                        onClick={() => handleDeleteInquiry(inq._id)}
+                        disabled={deletingInquiryId === inq._id}
+                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                      >
+                        {deletingInquiryId === inq._id ? 'Deleting...' : 'Delete'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 } 

@@ -8,7 +8,7 @@ const ShipmentItemSchema = new mongoose.Schema({
   },
   sku: {
     type: String,
-    required: [true, 'SKU is required'],
+    required: false,
     trim: true,
   },
   quantity: {
