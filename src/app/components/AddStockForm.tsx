@@ -79,9 +79,8 @@ export default function AddStockForm({ onStockAdded }: AddStockFormProps) {
               type="text"
               value={sku}
               onChange={(e) => setSku(e.target.value)}
-              required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-              placeholder="Enter SKU"
+              placeholder="Enter SKU (optional)"
             />
           </div>
           <div>

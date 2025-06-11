@@ -39,10 +39,10 @@ async function createShipment(req) {
 
     // Validate items structure
     for (const item of items) {
-      if (!item.productName || !item.sku || !item.quantity) {
+      if (!item.productName || !item.quantity) {
         console.log('Invalid item structure:', item);
         return Response.json(
-          { error: 'Each item must have productName, sku, and quantity' },
+          { error: 'Each item must have productName and quantity' },
           { status: 400 }
         );
       }
@@ -76,11 +76,14 @@ async function createShipment(req) {
       // Check and update stock quantities
       for (const item of items) {
         console.log(`Checking stock for item: ${item.productName} (${item.sku})`);
-        const stock = await Stock.findOne({
+        const stockQuery = {
           name: item.productName,
-          sku: item.sku,
-          location: From // Use From instead of location
-        }).session(session);
+          location: From
+        };
+        if (item.sku) {
+          stockQuery.sku = item.sku;
+        }
+        const stock = await Stock.findOne(stockQuery).session(session);
 
         if (!stock) {
           console.log(`Stock not found for: ${item.productName} (${item.sku})`);
